@@ -87,7 +87,13 @@
 									"referenceName": "PL_COPY",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": true
+								"waitOnCompletion": true,
+								"parameters": {
+									"table_name": {
+										"value": "@variables('bucket1')",
+										"type": "Expression"
+									}
+								}
 							}
 						}
 					]
