@@ -1,10 +1,10 @@
 {
-	"name": "PL_DEMO",
+	"name": "PL_LANDING_MAIN",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "Lookup_MetaData",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -16,58 +16,93 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "PostgreSqlV2Source",
-						"query": {
-							"value": "select * from @{pipeline().parameters.SC_NAME}.@{pipeline().parameters.TB_NAME}",
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT table_id from ctrl.table_config WHERE source_system = '@{pipeline().parameters.source_system}' and is_active=1",
 							"type": "Expression"
 						},
-						"queryTimeout": "02:00:00"
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
-					"sink": {
-						"type": "ParquetSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "ParquetWriteSettings"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_POSTGRE1",
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
 						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_MetaData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
-				"outputs": [
-					{
-						"referenceName": "DS_PARQUET1",
-						"type": "DatasetReference",
-						"parameters": {
-							"container": "landing",
-							"folder": "test"
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_MetaData').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "bucket1",
+								"value": {
+									"value": "@string(item().table_id)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Set variable1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "PL_COPY",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
+							}
 						}
-					}
-				]
+					]
+				}
 			}
 		],
 		"parameters": {
-			"TB_NAME": {
+			"source_system": {
 				"type": "String",
-				"defaultValue": "patients"
-			},
-			"SC_NAME": {
-				"type": "String",
-				"defaultValue": "public"
+				"defaultValue": "neon_postgres"
+			}
+		},
+		"variables": {
+			"bucket1": {
+				"type": "String"
 			}
 		},
 		"annotations": []
