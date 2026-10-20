@@ -89,7 +89,7 @@
 								},
 								"waitOnCompletion": true,
 								"parameters": {
-									"table_name": {
+									"table_id": {
 										"value": "@variables('bucket1')",
 										"type": "Expression"
 									}
