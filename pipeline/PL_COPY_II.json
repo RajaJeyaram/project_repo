@@ -1,5 +1,5 @@
 {
-	"name": "PL_COPY",
+	"name": "PL_COPY_II",
 	"properties": {
 		"activities": [
 			{
@@ -30,6 +30,39 @@
 					},
 					"firstRowOnly": true
 				}
+			},
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "PostgreSqlV2Source",
+						"queryTimeout": "02:00:00"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_POSTGRE1",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"parameters": {
