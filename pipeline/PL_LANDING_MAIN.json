@@ -51,28 +51,19 @@
 					"isSequential": false,
 					"activities": [
 						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "bucket1",
-								"value": {
-									"value": "@string(item().table_id)",
-									"type": "Expression"
-								}
-							}
-						},
-						{
 							"name": "Execute Pipeline1",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
-									"activity": "Set variable1",
+									"activity": "Inprogress_Status",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "get_run_id",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -90,9 +81,55 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"table_id": {
-										"value": "@variables('bucket1')",
+										"value": "@string(item().table_id)",
 										"type": "Expression"
 									}
+								}
+							}
+						},
+						{
+							"name": "Inprogress_Status",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "Project_AzureSqlDb",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "insert into ctrl.audit_log(adf_run_id,table_id,stage,status,start_time) values ('@{variables('run_id')}',@{item().table_id},'SOURCE_TO_SILVER','In_Progress',SYSUTCDATETIME())",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "get_run_id",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "run_id",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
 								}
 							}
 						}
@@ -108,6 +145,9 @@
 		},
 		"variables": {
 			"bucket1": {
+				"type": "String"
+			},
+			"run_id": {
 				"type": "String"
 			}
 		},
