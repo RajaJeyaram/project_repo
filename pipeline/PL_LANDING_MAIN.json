@@ -81,6 +81,10 @@
 									"table_id": {
 										"value": "@string(item().table_id)",
 										"type": "Expression"
+									},
+									"get_run_id": {
+										"value": "@variables('run_id')",
+										"type": "Expression"
 									}
 								}
 							}
