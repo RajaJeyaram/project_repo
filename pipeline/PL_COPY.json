@@ -185,6 +185,14 @@
 						"landing_timestamp": {
 							"value": "@variables('Date')",
 							"type": "Expression"
+						},
+						"merge_key": {
+							"value": "@coalesce(activity('Lookup1').output.firstRow.merge_keys,'')",
+							"type": "Expression"
+						},
+						"load_type": {
+							"value": "@activity('Lookup1').output.firstRow.load_type",
+							"type": "Expression"
 						}
 					}
 				},
@@ -303,6 +311,56 @@
 									"value": "@activity('Lookup_wtr_mrk').output.firstRow.watermark_value",
 									"type": "Expression"
 								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ifCond2",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "bronze-silver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(equals(activity('Lookup1').output.firstRow.load_type,'FULL'))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Script1",
+							"type": "Script",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "Project_AzureSqlDb",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"type": "Query",
+										"text": {
+											"value": "update ctrl.watermark\nset watermark_value = SYSUTCDATETIME()\nwhere table_id=@{activity('Lookup1').output.firstRow.table_id}",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
 							}
 						}
 					]
