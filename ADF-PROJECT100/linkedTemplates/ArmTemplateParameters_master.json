@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ADF-PROJECT100"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://rajastore.dfs.core.windows.net/"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://project-keyvault-raja.vault.azure.net/"
+		},
+		"LS_ADB_properties_typeProperties_existingClusterId": {
+			"value": "1019-100520-wi9br1qz"
+		},
+		"PostgreSql1_properties_typeProperties_server": {
+			"value": "ep-snowy-bar-b4r6au78-pooler.c-6.us-east-2.aws.neon.tech"
+		},
+		"PostgreSql1_properties_typeProperties_database": {
+			"value": "neondb"
+		},
+		"PostgreSql1_properties_typeProperties_username": {
+			"value": "neondb_owner"
+		},
+		"Project_AzureSqlDb_properties_typeProperties_server": {
+			"value": "project-server.database.windows.net"
+		},
+		"Project_AzureSqlDb_properties_typeProperties_database": {
+			"value": "db-project"
+		},
+		"Project_AzureSqlDb_properties_typeProperties_userName": {
+			"value": "Myproject"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
