@@ -178,7 +178,7 @@
 		"parameters": {
 			"source_system": {
 				"type": "String",
-				"defaultValue": "neon_postgres"
+				"defaultValue": "adls_csv"
 			}
 		},
 		"variables": {
