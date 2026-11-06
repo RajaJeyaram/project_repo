@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "Lookup_MetaData",
+				"description": "this is testing",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
